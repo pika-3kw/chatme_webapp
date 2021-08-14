@@ -27,11 +27,6 @@ const store = new Vuex.Store({
       state.friends.push(...friends);
     },
     addNewMessage(state, message) {
-      message = {
-        ...message,
-        from: state.user.socketId,
-      };
-
       const friends = [...state.friends];
       let receiverIndex = friends.findIndex(
         (friend) => friend.socketId === message.to
@@ -59,12 +54,9 @@ const store = new Vuex.Store({
     SET_FRIENDS({ commit }, friends) {
       commit("setFriends", friends);
     },
-    ADD_USER_MESSAGE({ commit }, message) {
-      commit("addNewMessage", message);
-    },
     SEND_MESSAGE({ commit }, message) {
       this.$socket.emit("PRIVATE_MESSAGE", message);
-      commit("addUserMessage", message);
+      commit("addNewMessage", message);
     },
     RECEIVE_MESSAGE({ commit }, message) {
       commit("receiveMessage", message);
