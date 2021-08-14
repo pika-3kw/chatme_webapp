@@ -1,6 +1,6 @@
 <template>
   <v-main class="main">
-    <v-form>
+    <v-form @submit.prevent="login">
       <v-container>
         <v-row justify="center">
           <v-col cols="12" sm="8" md="6">
@@ -15,14 +15,7 @@
           </v-col>
         </v-row>
         <v-row justify="center">
-          <v-btn
-            color="primary"
-            elevation="2"
-            @click="login"
-            :disabled="isDisableButton"
-            large
-            >Go!</v-btn
-          >
+          <v-btn color="primary" type="submit" elevation="2" large>Go!</v-btn>
         </v-row>
       </v-container>
     </v-form>
@@ -30,6 +23,8 @@
 </template>
 
 <script>
+import socket from "@/socket/socket";
+
 export default {
   data() {
     return {
@@ -44,23 +39,21 @@ export default {
   methods: {
     login() {
       const { username } = this.form;
-      this.$socket.auth = { username };
-      this.$socket.connect();
+      if (!username.length) return;
+      socket.auth = { username };
+      socket.connect();
     },
   },
   computed: {
-    isDisableButton() {
-      return this.form.username.length ? false : true;
+    user() {
+      return this.$store.getters.user;
     },
   },
-  sockets: {
-    connect() {
-      const user = {
-        username: this.$socket.auth.username,
-        socketId: this.$socket.id,
-      };
-      this.$store.dispatch("login", user);
-      this.$router.push("/");
+  watch: {
+    user(newValue, oldValue) {
+      if (!oldValue && newValue) {
+        this.$router.push("/");
+      }
     },
   },
 };
